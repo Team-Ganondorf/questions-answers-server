@@ -3,13 +3,13 @@ CREATE DATABASE qanda;
 \c qanda;
 
 CREATE TABLE questions (
-  id serial PRIMARY KEY,
+  question_id serial PRIMARY KEY,
   product_id INT NOT NULL,
-  body VARCHAR (255),
-  date BIGINT,
+  question_body VARCHAR (255),
+  question_date BIGINT,
   asker_name VARCHAR (50),
   asker_email VARCHAR (75),
-  helpfulness INT DEFAULT 0,
+  question_helpfulness INT DEFAULT 0,
   reported INT DEFAULT 0
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE answers (
   helpfulness INT DEFAULT 0,
   reported INT DEFAULT 0,
   FOREIGN KEY (question_id)
-    REFERENCES questions (id)
+    REFERENCES questions (question_id)
 );
 
 COPY answers
@@ -50,5 +50,5 @@ DELIMITER ','
 CSV HEADER;
 
 /*  Execute this file from the command line by typing:
- *    psql postgres < dbConfig.sql
+ *    psql postgres < db/dbConfig.sql
  *  to create the database and the tables.*/
