@@ -65,8 +65,38 @@ const getAnswers = (question_id, start, count) => {
   .catch((err) => console.log(err))
 };
 
+const addQuestion = ({body, name, email, product_id}) => {
+  return db.queryAsync(
+    `INSERT INTO questions (question_id, product_id, question_body, question_date, asker_name, asker_email, question_helpfulness, reported)
+    VALUES (default, ${product_id}, '${body}', ${Date.now()}, '${name}', '${email}', default, default);`
+  )
+  .then((data) => console.log(data))
+  .catch((err) => console.log(err))
+};
+
+const addAnswer = (question_id, {body, name, email, photos}) => {
+  console.log(question_id)
+  return db.queryAsync(
+    `WITH answerInsert AS (
+      INSERT INTO answers (id, question_id, body, date, answerer_name, answerer_email, helpfulness, reported)
+      VALUES (default, ${question_id}, '${body}', ${Date.now()}, '${name}', '${email}', default, default)
+      RETURNING id AS answer_id
+      ), photosInsert AS (
+        SELECT default AS id,
+        (SELECT answer_id FROM answerInsert) AS answer_id,
+        json_array_elements_text(${photos}) AS url
+      )
+    INSERT INTO photos (id, answer_id, url)
+    SELECT * FROM photosInsert;`
+  )
+  .then((data) => console.log(data))
+  .catch((err) => console.log(err))
+};
+
 module.exports = {
   db,
   getQuestions,
-  getAnswers
+  getAnswers,
+  addQuestion,
+  addAnswer
 };

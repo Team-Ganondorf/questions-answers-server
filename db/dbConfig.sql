@@ -49,6 +49,10 @@ FROM '/Users/sarahhandley/Desktop/Atelier_API_Info/answers_photos.csv'
 DELIMITER ','
 CSV HEADER;
 
+SELECT setval(pg_get_serial_sequence('questions', 'question_id'), MAX(question_id)) FROM questions;
+SELECT setval(pg_get_serial_sequence('answers', 'id'), MAX(id)) FROM answers;
+SELECT setval(pg_get_serial_sequence('photos', 'id'), MAX(id)) FROM photos;
+
 /*  Execute this file from the command line by typing:
  *    psql postgres < db/dbConfig.sql
  *  to create the database and the tables.*/

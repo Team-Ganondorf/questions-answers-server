@@ -1,13 +1,16 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const db = require('../db/index.js').db;
 const getQuestions = require('../db/index.js').getQuestions;
 const getAnswers = require('../db/index.js').getAnswers;
+const addQuestion = require('../db/index.js').addQuestion;
+const addAnswer = require('../db/index.js').addAnswer;
 
 const app = express();
 
 app.use(express.json());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({extended: true}));
 
 /**
  * Routes
@@ -35,18 +38,30 @@ app.get('/qa/questions/:question_id/answers', (req, res) => {
       'results': data
     }))
     .catch((err) => {
-      console.log('answers req failure');
+      console.log('answers req failure', err);
       res.status(501);
     })
 });
 
-app.post('qa/questions', (req, res) => {
-  console.log(req.query);
-  console.log('finish post question req');
+app.post('/qa/questions', (req, res) => {
+  addQuestion(req.query)
+    .then(() => {
+      console.log('question post req success');
+      res.status(200);
+    })
+    .catch((err) => {
+      console.log('question post req failure', err)
+      res.status(502);
+    })
 });
 
 app.post('/qa/questions/:question_id/answers', (req, res) => {
-  console.log('finish post answer req');
+  addAnswer(req.params.question_id, req.query)
+    .then(() => console.log('answer post req success'))
+    .catch((err) => {
+      console.log('answer post req failure', err)
+      res.status(502);
+    })
 });
 
 app.put('/qa/questions/:question_id/helpful', (req, res) => {
