@@ -6,6 +6,10 @@ const getQuestions = require('../db/index.js').getQuestions;
 const getAnswers = require('../db/index.js').getAnswers;
 const addQuestion = require('../db/index.js').addQuestion;
 const addAnswer = require('../db/index.js').addAnswer;
+const markQuestionHelpful = require('../db/index.js').markQuestionHelpful;
+const reportQuestion = require('../db/index.js').reportQuestion;
+const markAnswerHelpful = require('../db/index.js').markAnswerHelpful;
+const reportAnswer = require('../db/index.js').reportAnswer;
 
 const app = express();
 
@@ -39,7 +43,7 @@ app.get('/qa/questions/:question_id/answers', (req, res) => {
     }))
     .catch((err) => {
       console.log('answers req failure', err);
-      res.status(501);
+      res.status(500);
     })
 });
 
@@ -47,11 +51,11 @@ app.post('/qa/questions', (req, res) => {
   addQuestion(req.query)
     .then(() => {
       console.log('question post req success');
-      res.end();
+      res.status(201);
     })
     .catch((err) => {
       console.log('question post req failure', err)
-      res.status(502);
+      res.status(501);
     })
 });
 
@@ -59,28 +63,60 @@ app.post('/qa/questions/:question_id/answers', (req, res) => {
   addAnswer(req.params.question_id, req.query)
     .then(() => {
       console.log('answer post req success');
-      res.end();
+      res.status(201);
     })
     .catch((err) => {
       console.log('answer post req failure', err)
-      res.status(502);
+      res.status(501);
     })
 });
 
 app.put('/qa/questions/:question_id/helpful', (req, res) => {
-  console.log('finish put question helpful req');
+  markQuestionHelpful(req.params.question_id)
+    .then(() => {
+      console.log('question helpful req success');
+      res.status(204);
+    })
+    .catch((err) => {
+      console.log('question helpful req failure', err)
+      res.status(504);
+    })
 });
 
 app.put('/qa/questions/:question_id/report', (req, res) => {
-  console.log('finish put question report req');
+  reportQuestion(req.params.question_id)
+    .then(() => {
+      console.log('question report req success');
+      res.status(204);
+    })
+    .catch((err) => {
+      console.log('question report req failure', err)
+      res.status(504);
+    })
 });
 
 app.put('/qa/answers/:answer_id/helpful', (req, res) => {
-  console.log('finish put answer helpful req');
+  markAnswerHelpful(req.params.answer_id)
+    .then(() => {
+      console.log('answer helpful req success');
+      res.status(204);
+    })
+    .catch((err) => {
+      console.log('answer helpful req failure', err)
+      res.status(504);
+    })
 });
 
 app.put('/qa/answers/:answer_id/report', (req, res) => {
-  console.log('finish put answer report req');
+  reportAnswer(req.params.answer_id)
+    .then(() => {
+      console.log('answer report req success');
+      res.status(204);
+    })
+    .catch((err) => {
+      console.log('answer report req failure', err)
+      res.status(504);
+    })
 });
 
 app.listen(process.env.PORT);

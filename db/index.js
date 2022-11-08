@@ -102,10 +102,54 @@ const addAnswer = (question_id, {body, name, email, photos}) => {
   .catch((err) => console.log(err))
 };
 
+const markQuestionHelpful = (question_id) => {
+  return db.queryAsync(
+    `UPDATE questions
+    SET question_helpfulness = (SELECT question_helpfulness FROM questions WHERE question_id = ${question_id})+1
+    WHERE question_id = ${question_id};`
+  )
+  .then(() => console.log('marked question as helpful'))
+  .catch((err) => console.log(err))
+};
+
+const reportQuestion = (question_id) => {
+  return db.queryAsync(
+    `UPDATE questions
+    SET reported = (SELECT reported FROM questions WHERE question_id = ${question_id})+1
+    WHERE question_id = ${question_id};`
+  )
+  .then(() => console.log('reported question'))
+  .catch((err) => console.log(err))
+};
+
+const markAnswerHelpful = (answer_id) => {
+  return db.queryAsync(
+    `UPDATE answers
+    SET helpfulness = (SELECT helpfulness FROM answers WHERE id = ${answer_id})+1
+    WHERE id = ${answer_id};`
+  )
+  .then(() => console.log('marked answer as helpful'))
+  .catch((err) => console.log(err))
+};
+
+const reportAnswer = (answer_id) => {
+  return db.queryAsync(
+    `UPDATE answers
+    SET reported = (SELECT reported FROM answers WHERE id = ${answer_id})+1
+    WHERE id = ${answer_id};`
+  )
+  .then(() => console.log('reported answer'))
+  .catch((err) => console.log(err))
+};
+
 module.exports = {
   db,
   getQuestions,
   getAnswers,
   addQuestion,
-  addAnswer
+  addAnswer,
+  markQuestionHelpful,
+  reportQuestion,
+  markAnswerHelpful,
+  reportAnswer
 };
