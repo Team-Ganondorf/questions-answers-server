@@ -75,21 +75,30 @@ const addQuestion = ({body, name, email, product_id}) => {
 };
 
 const addAnswer = (question_id, {body, name, email, photos}) => {
-  console.log(question_id)
+  console.log(photos);
   return db.queryAsync(
-    `WITH answerInsert AS (
-      INSERT INTO answers (id, question_id, body, date, answerer_name, answerer_email, helpfulness, reported)
-      VALUES (default, ${question_id}, '${body}', ${Date.now()}, '${name}', '${email}', default, default)
-      RETURNING id AS answer_id
-      ), photosInsert AS (
-        SELECT default AS id,
-        (SELECT answer_id FROM answerInsert) AS answer_id,
-        json_array_elements_text(${photos}) AS url
-      )
-    INSERT INTO photos (id, answer_id, url)
-    SELECT * FROM photosInsert;`
+    `INSERT INTO answers (id, question_id, body, date, answerer_name, answerer_email, helpfulness, reported)
+    VALUES (default, ${question_id}, '${body}', ${Date.now()}, '${name}', '${email}', default, default)
+    RETURNING id AS answer_id;`
   )
-  .then((data) => console.log(data))
+  .then((data) => {
+    console.log(data[0].rows[0].answer_id);
+    if (photos && photos !== '[]') {
+      let urls = photos.slice(1, photos.length - 1).split(', ');
+      let values = [];
+      urls.forEach((url) => {
+        values.push(`(default, ${data[0].rows[0].answer_id}, $$${url}$$)`);
+      });
+      values = values.join(', ');
+      console.log(values);
+      return db.queryAsync(
+        `INSERT INTO photos (id, answer_id, url)
+        VALUES ${values}
+        RETURNING *;`
+      )
+    }
+  })
+  .then(() => console.log('answer posted'))
   .catch((err) => console.log(err))
 };
 

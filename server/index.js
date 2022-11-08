@@ -47,7 +47,7 @@ app.post('/qa/questions', (req, res) => {
   addQuestion(req.query)
     .then(() => {
       console.log('question post req success');
-      res.status(200);
+      res.end();
     })
     .catch((err) => {
       console.log('question post req failure', err)
@@ -57,7 +57,10 @@ app.post('/qa/questions', (req, res) => {
 
 app.post('/qa/questions/:question_id/answers', (req, res) => {
   addAnswer(req.params.question_id, req.query)
-    .then(() => console.log('answer post req success'))
+    .then(() => {
+      console.log('answer post req success');
+      res.end();
+    })
     .catch((err) => {
       console.log('answer post req failure', err)
       res.status(502);
