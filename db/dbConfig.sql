@@ -53,6 +53,14 @@ SELECT setval(pg_get_serial_sequence('questions', 'question_id'), MAX(question_i
 SELECT setval(pg_get_serial_sequence('answers', 'id'), MAX(id)) FROM answers;
 SELECT setval(pg_get_serial_sequence('photos', 'id'), MAX(id)) FROM photos;
 
+CREATE INDEX product_id_index ON questions(product_id);
+CREATE INDEX reported_questions ON questions(reported);
+
+CREATE INDEX question_id_index ON answers(question_id);
+CREATE INDEX reported_answers ON answers(reported);
+
+CREATE INDEX answer_id_index ON photos(answer_id);
+
 /*  Execute this file from the command line by typing:
  *    psql postgres < db/dbConfig.sql
  *  to create the database and the tables.*/
