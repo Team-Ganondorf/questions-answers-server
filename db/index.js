@@ -29,18 +29,34 @@ const getQuestions = (product_id, start, count) => {
     CASE
       WHEN count(a.id) = 0 THEN '{}'
       ELSE (json_build_object(a.id, json_build_object(
-        'id', a.id, 'body', a.body, 'date', TO_CHAR(TO_TIMESTAMP(a.date / 1000), 'YYYY-MM-DD"T"HH24:MI:SS.MSZ'), 'answerer_name', a.answerer_name, 'helpfulness', a.helpfulness
+        'id', a.id, 'body', a.body, 'date', TO_CHAR(TO_TIMESTAMP(a.date / 1000), 'YYYY-MM-DD"T"HH24:MI:SS.MSZ'), 'answerer_name', a.answerer_name, 'helpfulness', a.helpfulness, 'photos',
+        (CASE
+          WHEN count(p.id) = 0 THEN '[]'
+          ELSE json_agg(json_build_object('id', p.id, 'url', p.url))
+        END)
       )))
     END as answers
     FROM questions q LEFT JOIN answers a
     ON q.question_id = a.question_id AND a.reported = 0
-    WHERE q.reported = 0
-    GROUP BY q.question_id, a.id
-    OFFSET ${start} ROWS
-    FETCH NEXT ${count} ROWS ONLY;`
+    LEFT JOIN photos p
+    ON a.id = p.answer_id
+    WHERE q.reported = 0 AND product_id = ${product_id}
+    GROUP BY q.question_id, a.id;`
   )
   .then((data) => {
-    console.log(data[0].rows);
+    let rawQuestions = data[0].rows;
+    let questions = [];
+    let previousQuestionId = 0;
+    for (let i = 0; i < rawQuestions.length; i++) {
+      if (previousQuestionId !== rawQuestions[i].question_id) {
+        previousQuestionId = rawQuestions[i].question_id;
+        questions.push(rawQuestions[i]);
+      } else {
+        let currentAnswers = questions[questions.length - 1].answers;
+        questions[questions.length - 1].answers = Object.assign(currentAnswers, rawQuestions[i].answers);
+      }
+    }
+    return questions;
   })
   .catch((err) => console.log(err))
 };

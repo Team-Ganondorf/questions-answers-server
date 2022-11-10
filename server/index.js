@@ -25,7 +25,10 @@ app.get('/qa/questions', (req, res) => {
   let count = req.query.count ? req.query.count : 5;
   let start = (page - 1) * count;
   getQuestions(product_id, start, count)
-    .then(() => console.log('questions req made it back to server'))
+    .then((data) => res.send({
+      'product_id': product_id,
+      'results': data
+    }))
     .catch((err) => console.log('questions req failure'))
 });
 
@@ -44,6 +47,7 @@ app.get('/qa/questions/:question_id/answers', (req, res) => {
     .catch((err) => {
       console.log('answers req failure', err);
       res.status(500);
+      res.end();
     })
 });
 
@@ -52,10 +56,12 @@ app.post('/qa/questions', (req, res) => {
     .then(() => {
       console.log('question post req success');
       res.status(201);
+      res.end();
     })
     .catch((err) => {
       console.log('question post req failure', err)
       res.status(501);
+      res.end();
     })
 });
 
@@ -64,10 +70,12 @@ app.post('/qa/questions/:question_id/answers', (req, res) => {
     .then(() => {
       console.log('answer post req success');
       res.status(201);
+      res.end();
     })
     .catch((err) => {
       console.log('answer post req failure', err)
       res.status(501);
+      res.end();
     })
 });
 
@@ -76,10 +84,12 @@ app.put('/qa/questions/:question_id/helpful', (req, res) => {
     .then(() => {
       console.log('question helpful req success');
       res.status(204);
+      res.end();
     })
     .catch((err) => {
       console.log('question helpful req failure', err)
       res.status(504);
+      res.end();
     })
 });
 
@@ -88,10 +98,12 @@ app.put('/qa/questions/:question_id/report', (req, res) => {
     .then(() => {
       console.log('question report req success');
       res.status(204);
+      res.end();
     })
     .catch((err) => {
       console.log('question report req failure', err)
       res.status(504);
+      res.end();
     })
 });
 
@@ -100,10 +112,12 @@ app.put('/qa/answers/:answer_id/helpful', (req, res) => {
     .then(() => {
       console.log('answer helpful req success');
       res.status(204);
+      res.end();
     })
     .catch((err) => {
       console.log('answer helpful req failure', err)
       res.status(504);
+      res.end();
     })
 });
 
@@ -112,10 +126,12 @@ app.put('/qa/answers/:answer_id/report', (req, res) => {
     .then(() => {
       console.log('answer report req success');
       res.status(204);
+      res.end();
     })
     .catch((err) => {
       console.log('answer report req failure', err)
       res.status(504);
+      res.end();
     })
 });
 
